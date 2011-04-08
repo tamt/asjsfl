@@ -2,6 +2,8 @@
 <?xml-stylesheet href="chrome://asjsfl/skin/overlay.css" type="text/css"?>
 <!DOCTYPE overlay SYSTEM "chrome://asjsfl/locale/overlay.dtd">
 <overlay id="asjsfl-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+	<script src="lib/jquery.js"/>
+	<script src="lib/Io.js"/>
   <script src="overlay.js"/>
   <script src="ff-overlay.js"/>
 
