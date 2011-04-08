@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://asjsfl/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://asjsfl/locale/overlay.dtd">
+<overlay id="asjsfl-overlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script src="overlay.js"/>
+  <script src="ff-overlay.js"/>
+
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="asjsfl-strings" src="chrome://asjsfl/locale/overlay.properties"/>
+  </stringbundleset>
+
+  <popup id="contentAreaContextMenu">
+    <menuitem id="context-asjsfl" label="&asjsflContext.label;"
+              accesskey="&asjsflContext.accesskey;"
+              insertafter="context-stop"
+              oncommand="asjsfl.onMenuItemCommand(event)"/>
+  </popup>
+
+
+
+
+</overlay>

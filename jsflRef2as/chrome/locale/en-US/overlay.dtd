@@ -1,0 +1,8 @@
+<!ENTITY asjsfl.label "Your localized menuitem">
+<!ENTITY asjsflContext.label "Your Menuitem">
+<!ENTITY asjsflContext.accesskey "Y">
+<!ENTITY asjsflToolbarButton.label "Your Toolbar Button">
+<!ENTITY asjsflToolbarButton.tooltip "This is your toolbar button!">
+<!ENTITY asjsflSidebar.label "Your Sidebar">
+<!ENTITY asjsflToolbar.name  "example">
+<!ENTITY asjsflToolbar.label "This is an example toolbar. You can hide it under View &gt; toolbars &gt; &asjsflToolbar.name;">
