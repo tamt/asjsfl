@@ -8,6 +8,6 @@
 	 	 * @productversion %PRODUCT_VERSION%
 	 	 * @see %SEE%
 		 */
-		public function %FUNCTION_NAME%():%FUNCTION_RETURN%{
+		public function %FUNCTION_NAME%(%FUNCTION_PARAMS%):%FUNCTION_RETURN%{
 			
 		}

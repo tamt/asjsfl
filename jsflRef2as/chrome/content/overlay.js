@@ -38,6 +38,17 @@ var asjsfl = {
 	//
   onMenuItemCommand: function(e) {
 	this.win = window._content.document;
+	
+	var _prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+	var exportPath = _prefService.getComplexValue("extensions.asjsfl.exportPath", Components.interfaces.nsISupportsString).data;
+	if(exportPath == null || jQuery.trim(exportPath)==""){
+		exportPath = prompt("设置输出路径", "");
+		var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
+		str.data = exportPath;
+		_prefService.setComplexValue("extensions.asjsfl.exportPath", Components.interfaces.nsISupportsString, str);
+		onMenuItemCommand(e);
+		return;
+	}
     
     if($("h1", this.win)){
 	    var h1Str =jQuery.trim($("h1", this.win).text());
@@ -76,7 +87,7 @@ var asjsfl = {
 				}
 			}
 			
-			var class = {name:className, description:description, productversion:productversion, functions:funs, props:props};
+			var class = {name:className, description:description, see:see, productversion:productversion, functions:funs, props:props};
 			//输出到as类文件
 			asjsfl.exportClass2ASFile(class);
 	    }else if(h1Str.lastIndexOf("()")>0 || h1Str.lastIndexOf(".")>0){
@@ -108,7 +119,18 @@ var asjsfl = {
 	    	if(scope)func.usage = "<pre>" + $("pre", $(scope, this.win).parent()).html() + "</pre>";
 	    	//参数
 	    	scope = $('#content_wrapper .section .sectiontitle[innerHTML="参数"]', this.win);
-	    	if(scope)func.param = $("p", $(scope, this.win).parent()).text();
+	    	if(scope){
+	    		scope = $(scope, this.win).parent()
+	    		if($('dl', scope)){
+	    			func.params = [];
+	    			var paramNames = $('dt samp', scope);
+	    			var paramDess = $('dd', scope);
+	    			for(var i = 0; i<paramNames.length; i++){
+	    				var param = {name:$(paramNames[i], scope).text(), description:$(paramDess[i], scope).text()};
+	    				func.params.push(param);
+	    			}
+	    		}
+	    	}
 	    	//返回
 	    	scope = $('#content_wrapper .section .sectiontitle[innerHTML="返回"]', this.win);
 	    	if(scope)func.result = $("p", $(scope, this.win).parent()).text();
@@ -336,9 +358,14 @@ var asjsfl = {
 	  	}
 	  	
 	  	//替换“参数”字段
-	  	if(func.param && funcStr.match(/%PARAM%/)){
-	  		funcStr = funcStr.replace(/%PARAM%/, func.param);
+	  	if(func.params && funcStr.match(/%PARAM%/)){
+//	  		funcStr = funcStr.replace(/%PARAM%/, func.params);
 	  	}
+	  	
+	  	//替换"函数参数"字段
+	  	if(func.params && funcStr.match(/%FUNCTION_PARAMS%/)){
+	  			
+  		}
 	  	
 	  	//替换“返回结果”字段
 	  	if(func.result && funcStr.match(/%RETURN%/)){
@@ -411,6 +438,11 @@ var asjsfl = {
 	  	}
 	  	
 	  	return funcStr;
+  },
+  
+  //给定一段描述,返回描述的是什么数据类型.
+  getMeanType:function(description){
+	  
   },
 
   onToolbarButtonCommand: function(e) {
