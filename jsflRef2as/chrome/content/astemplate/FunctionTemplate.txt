@@ -1,0 +1,13 @@
+﻿	
+		/**
+		 * %DESCRIPTION%
+		 * @param %PARAM%
+		 * @return %RETURN%
+		 * @example %EXAMPLE%
+		 * @usage %USAGE%
+	 	 * @productversion %PRODUCT_VERSION%
+	 	 * @see %SEE%
+		 */
+		public function %FUNCTION_NAME%():%FUNCTION_RETURN%{
+			
+		}

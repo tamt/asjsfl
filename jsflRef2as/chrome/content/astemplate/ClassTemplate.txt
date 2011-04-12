@@ -1,0 +1,16 @@
+﻿package jsfl{
+	
+	/**
+	 * %DESCRIPTION%
+	 * @productversion %PRODUCT_VERSION%
+	 * @see %SEE%
+	 */
+	public class %CLASS_NAME%{
+	
+		public function %CLASS_NAME%(){
+			
+		}
+		
+	}
+
+}
