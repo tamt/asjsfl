@@ -148,10 +148,10 @@ var asjsfl = {
 	    	
 	    	if(h1Str.indexOf(".")>0){
 	    		if(h1Str.lastIndexOf("()")>0){
-	    			alert("类方法模式: ");
+	    			//alert("类方法模式: ");
 	    			asjsfl.exportClassFunction2ASFile(className, func, 0);
 	    		}else{
-	    			alert("类属性模式: " + func.name);
+	    			//alert("类属性模式: " + func.name);
 	    			if(func.description.indexOf("只读")>=0){
 	    				asjsfl.exportClassFunction2ASFile(className, func, -1);
 	    			}else{
@@ -160,7 +160,7 @@ var asjsfl = {
 	    			}
 	    		}
 	    	}else if(h1Str.lastIndexOf("()")>0){
-		    	alert("顶级方法模式");
+		    	//alert("顶级方法模式");
 		    	asjsfl.exportTopLevelFunction2ASFile(func);
 	    	}
 	    }
@@ -263,30 +263,30 @@ var asjsfl = {
 	  	}
 	  	
 	  	//把func转化成字符串
-	  	alert("exportClassFunction2ASFile: " + func.name);
+	  	//alert("exportClassFunction2ASFile: " + func.name);
 	  	var funcStr = asjsfl.implementFuncStrFromTemplate(template, func, propMode);
 	  	
 	  	//读取类文件，并把里面该函数的定义替换成新的
 	  	var fileStr = fInspectorFileIO.read(as3File, 'utf-8');
 	  	var reg;
 	  	if(propMode == 0){
-	  		reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+function\\s+" + func.name + ".?\\(.?\\).?:*\\w*\\{");
+	  		reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+function\\s+" + func.name + ".?\\(.*\\).?:*\\w*\\{");
 	  	}else if(propMode == 1){
-	  		reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+set\\s+function\\s+" + func.name + ".?\\(.?\\).?:*\\w*\\{");
+	  		reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+set\\s+function\\s+" + func.name + ".?\\(.*\\).?:*\\w*\\{");
 	  	}else if(propMode == -1){
-	  		reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+get\\s+function\\s+" + func.name + ".?\\(.?\\).?:*\\w*\\{");
+	  		reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+get\\s+function\\s+" + func.name + ".?\\(.*\\).?:*\\w*\\{");
 	  	}
 	  	var outputStr;
 	  	if(fileStr.match(reg)){
-	  		alert("定义已经存在");
+	  		//alert("定义已经存在");
 		  	//如果当前类中已经存在这个函数的定义
-	  		alert(funcStr);
+	  		//alert(funcStr);
 	  		outputStr = fileStr.replace(reg, funcStr.match(reg)[0]);
 	  	}else{
-	  		alert("定义不存在");
+	  		//alert("定义不存在");
 	  		//如果当前类中还没有这个函数的定义
 	  		var sliceIndex = fileStr.indexOf("}", fileStr.lastIndexOf("{")) + 1;
-	  		outputStr = fileStr.substring(0, sliceIndex) + "\n" + funcStr + "\n" + fileStr.substring(sliceIndex);
+	  		outputStr = fileStr.substring(0, sliceIndex) + "\n" + funcStr + fileStr.substring(sliceIndex);
 	  	}
   		fInspectorFileIO.write(as3File, outputStr, '', 'utf-8');
   },
@@ -322,7 +322,7 @@ var asjsfl = {
 	  	
 	  	//读取类文件，并把里面该函数的定义替换成新的
 	  	var fileStr = fInspectorFileIO.read(as3File, 'utf-8');
-	  	var reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+function\\s+" + func.name + ".?\\(.?\\).?:*\\w*\\{");
+	  	var reg = new RegExp("/\\*[^*]*\\*+([^/*][^*]*\\*+)*/\\s+public\\s+function\\s+" + func.name + ".?\\(.*\\).?:*\\w*\\{");
 	  	var outputStr;
 	  	if(fileStr.match(reg)){
 		  	//如果当前类中已经存在这个函数的定义
@@ -343,7 +343,7 @@ var asjsfl = {
 	  		if(propMode == 1){
 	  			funcStr = funcStr.replace(/%FUNCTION_NAME%/, "set " + func.name);
 	  		}else if(propMode == -1){
-	  			alert("get " + func.name);
+	  			//alert("get " + func.name);
 	  			funcStr = funcStr.replace(/%FUNCTION_NAME%/, "get " + func.name);
 	  		}else if(propMode == 0){
 	  			funcStr = funcStr.replace(/%FUNCTION_NAME%/, func.name);
@@ -359,12 +359,28 @@ var asjsfl = {
 	  	
 	  	//替换“参数”字段
 	  	if(func.params && funcStr.match(/%PARAM%/)){
-//	  		funcStr = funcStr.replace(/%PARAM%/, func.params);
+	  		var paramsStr = "";
+	  		var paramTempStr = funcStr.match(/^.*\*\s?@param\s?%PARAM%/m) + "";
+	  		alert(funcStr);
+	  		alert(paramTempStr);
+	  		for(var i=0; i<func.params.length; i++){
+	  			if(i>0)paramsStr+="\n";
+	  			paramsStr += paramTempStr.replace(/%PARAM%/, func.params[i].name + "	" + func.params[i].description);
+	  		}
+	  		funcStr = funcStr.replace(/^.*\*\s?@param\s?%PARAM%/m, paramsStr);
 	  	}
 	  	
 	  	//替换"函数参数"字段
 	  	if(func.params && funcStr.match(/%FUNCTION_PARAMS%/)){
-	  			
+	  		var paramsStr = "";
+	  		for(var i = 0; i<func.params.length; i++){
+	  			var param = func.params[i];
+	  			var type = asjsfl.getMeanType(param.name);
+	  			if(type == "Something")type = asjsfl.getMeanType(param.description);
+	  			if(i>0)paramsStr+=", ";
+	  			paramsStr += param.name + ":" + type;
+	  		}
+	  		funcStr = funcStr.replace(/%FUNCTION_PARAMS%/, paramsStr);
   		}
 	  	
 	  	//替换“返回结果”字段
@@ -376,45 +392,12 @@ var asjsfl = {
 	  	if(propMode == 1){
 	  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "void");
 	  	}else if(propMode == -1){
-	  		if(func.description.match(/\s?\w+\s?对象/)){
-	  			var matchStr = func.description.match(/\s?\w+\s?对象/) + "";
-	  			var match = matchStr.match(/\S+/) + "";
-	  			funcStr = funcStr.replace(/%FUNCTION_RETURN%/, match);
-	  		}else if(func.description.indexOf("布尔值")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "Boolean");
-	  		}else if(func.description.indexOf("字符串")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "String");
-	  		}else if(func.description.indexOf("一个整数")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "int");
-	  		}else if(func.description.indexOf("一个点")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "Point");
-	  		}else if(func.description.indexOf("矩形")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "Rectangle");
-	  		}else{
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "void");
-		  	}
+	  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, asjsfl.getMeanType(func.description));
 	  	}else if((propMode == 0) && func.result && funcStr.match(/%FUNCTION_RETURN%/)){
-	  		if(func.result.indexOf("无") == 0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "void");
-	  		}else if(func.result.match(/\s?\w+\s?对象/)){
-	  			var matchStr = func.result.match(/\s?\w+\s?对象/) + "";
-	  			var match = matchStr.match(/\S+/) + "";
-	  			funcStr = funcStr.replace(/%FUNCTION_RETURN%/, match);
-	  		}else if(func.result.indexOf("布尔值")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "Boolean");
-	  		}else if(func.result.indexOf("字符串")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "String");
-	  		}else if(func.result.indexOf("一个整数")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "int");
-	  		}else if(func.result.indexOf("一个点")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "Point");
-	  		}else if(func.result.indexOf("矩形")>=0){
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "Rectangle");
-	  		}else{
-		  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "void");
-		  	}
+	  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, asjsfl.getMeanType(func.result));
 	  	}else{
-	  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "void");
+	  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, asjsfl.getMeanType(func.description));
+//	  		funcStr = funcStr.replace(/%FUNCTION_RETURN%/, "Something");
 	  	}
 
 	  	//替换“示例”字段
@@ -442,7 +425,29 @@ var asjsfl = {
   
   //给定一段描述,返回描述的是什么数据类型.
   getMeanType:function(description){
-	  
+	  	var type;
+		if(description.indexOf("无") == 0){
+			type = "void";
+		}else if(description.match(/\s?\w+\s?对象/)){
+			var matchStr = description.match(/\s?\w+\s?对象/) + "";
+			var match = matchStr.match(/\S+/) + "";
+			type = match;
+		}else if(description.indexOf("布尔值")>=0){
+			type = "Boolean";
+		}else if(description.indexOf("字符串")>=0){
+	  		type = "String";
+		}else if(description.indexOf("一个整数")>=0 || description.indexOf("一个索引")>=0 || description.indexOf("的索引")>=0){
+	  		type = "int";
+		}else if(description.indexOf("一个点")>=0){
+	  		type = "Point";
+		}else if(description.indexOf("矩形")>=0){
+	  		type = "Rectangle";
+		}else if(description.indexOf("的数组")>=0){
+			type = "Array";
+		}else{
+	  		type = "Something";
+	  	}
+		return type;
   },
 
   onToolbarButtonCommand: function(e) {
