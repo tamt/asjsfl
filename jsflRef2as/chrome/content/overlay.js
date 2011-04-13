@@ -5,6 +5,8 @@ $ = function(selector,context) {
 $.fn = $.prototype = jQuery.fn;
 
 var asjsfl = {
+	lastAutoIndex:"2",
+	autoMode:false,
   onLoad: function() {
     // initialization code
     this.initialized = true;
@@ -16,28 +18,23 @@ var asjsfl = {
   
   //注入jQuery
   injectJQ:function(doc,aEvent){
-		// Check for website
-		if (!doc.location.href.match(/^http:\/\/(.*\.)?adobe\.com(\/.*)?$/i))  
-		    return;
-		
-		// Check if already loaded
-		if (doc.getElementById("plugin-example")) return;
-		
 		// Setup
 		this.win = aEvent.target.defaultView.wrappedJSObject;
 		this.doc = doc;
-		
-		// Hello World
-		this.main = main = $('<div id="plugin-example">').appendTo(doc.body).html('Example Loaded!');
-		main.css({ 
-		    background:'#FFF',color:'#000',position:'absolute',top:0,left:0,padding:8
-		});
-		main.html(main.html() + ' - jQuery <b>' + $.fn.jquery + '</b>');
+	},
+	
+	autoExec:function(){
+		if(asjsfl.autoMode){
+			asjsfl.onMenuItemCommand(null);
+			gBrowser.removeCurrentTab();
+			asjsfl.onMenuItemCommand(null);
+		}
 	},
 	
 	//
   onMenuItemCommand: function(e) {
-	this.win = window._content.document;
+//	this.win = window._content.document;
+	this.win = gBrowser.contentDocument.wrappedJSObject;
 	
 	var _prefService = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
 	var exportPath = _prefService.getComplexValue("extensions.asjsfl.exportPath", Components.interfaces.nsISupportsString).data;
@@ -49,8 +46,73 @@ var asjsfl = {
 		onMenuItemCommand(e);
 		return;
 	}
-    
-    if($("h1", this.win)){
+
+	if(this.win.location.href=="http://help.adobe.com/zh_CN/flash/cs/extend/index.html"){
+		//alert("全自动模式");
+		if((!asjsfl.autoMode && confirm("执行全自动模式？")) || asjsfl.autoMode){
+			asjsfl.autoMode = true;
+			
+			//把所有的结点折叠
+			if($("#ygtvc0 .ygtvitem .ygtvtm", this.win)){
+				$("#ygtvc0 .ygtvitem .ygtvtm", this.win).click();
+			}
+			
+			//开始处理
+			var items = $("#ygtvc0 .ygtvitem:visible", this.win);
+			var indexs = asjsfl.lastAutoIndex.split(".");
+			
+			//alert("提取：" + asjsfl.lastAutoIndex);
+			
+			//已经达到最后一个结点
+			if(Number(indexs[0])>=items.length){
+				alert("转化完毕");
+				asjsfl.autoMode = false;
+				return;
+			}
+			
+			//这个结点处于“折叠、展开”状态
+			var item = $(items[Number(indexs[0])], this.win);
+			//折叠ygtvtp，展开ygtvtm
+			if($(".ygtvtp", item)){
+				//处于折叠状态，则展开之
+				$(".ygtvtp", item).click();
+			}
+
+			var hrefEle;
+			if(indexs.length==1){
+				//提取结点模式
+				hrefEle = $("table:first a", item);
+				
+				//指向下一个处理结点
+				if($(".ygtvchildren .ygtvitem", item)){
+					asjsfl.lastAutoIndex = Number(indexs[0]) + "." + 0;
+				}else{
+					asjsfl.lastAutoIndex = Number(indexs[0]) + 1 + "";
+				}
+			}else if(indexs.length>1){
+				//提取子结点模式
+				var subnode = $(".ygtvchildren .ygtvitem", item)[Number(indexs[1])];
+				hrefEle = $("table:first a", subnode);
+
+				//指向下一个处理结点
+				if(Number(indexs[1]) >= ($(".ygtvchildren .ygtvitem", item).length - 1)){
+					asjsfl.lastAutoIndex = Number(indexs[0]) + 1 + "";
+				}else{
+					asjsfl.lastAutoIndex = Number(indexs[0]) + "." + (Number(indexs[1])+1);
+				}
+			}
+			
+			//页面跳转
+			if(hrefEle){
+				hrefEle = $(hrefEle, this.win);
+				var domain = this.win.location.href.substring(0, this.win.location.href.lastIndexOf("/") + 1);
+				//this.win.location = domain + hrefEle.attr("href");
+				gBrowser.selectedTab = gBrowser.addTab(domain + hrefEle.attr("href"));
+			}
+		}
+		
+		return;
+	}else if($("h1", this.win)){
 	    var h1Str =jQuery.trim($("h1", this.win).text());
 	    //类名称
 	    var className;
@@ -59,6 +121,7 @@ var asjsfl = {
 
     	//类模式
 	    if(h1Str.lastIndexOf("对象")>0){
+	    	
 	    	//提取类名称
 	    	className = h1Str.substring(0, h1Str.lastIndexOf("对象") - 1);
 	    	//可用性
@@ -68,13 +131,19 @@ var asjsfl = {
 	    	//参见
 	    	var see = this.win.location;
 	    	
-	    	//方法摘要
-	    	var scope = $("div .tablenoborder table", this.win)[0];
-			var eles = $("td", scope);
-			var funs = [];
+			var funs;
 			var props;
-			for(var i=0; i<eles.length;){
-				funs.push({name:jQuery.trim($(eles[i++], this.win).text()), description:jQuery.trim($(eles[i++], this.win).text())});
+			var scope;
+			var eles;
+			
+	    	//方法摘要
+			if($("div .tablenoborder table", this.win).length>0){
+		    	scope = $("div .tablenoborder table", this.win)[0];
+				eles = $("td", scope);
+				funs = [];
+				for(var i=0; i<eles.length;){
+					funs.push({name:jQuery.trim($(eles[i++], this.win).text()), description:jQuery.trim($(eles[i++], this.win).text())});
+				}
 			}
 			
 			//属性摘要
@@ -213,26 +282,28 @@ var asjsfl = {
 	  	
 	  	fInspectorFileIO.write(as3File, outputStr, '', 'utf-8');
 	  	
-	  	//若有funs数据，则进行相应替换
-	  	if(class.functions){
-	  		for(var i=0;i<class.functions.length; i++){
-	  			asjsfl.exportClassFunction2ASFile(class.name, class.functions[i], 0);
-	  		}
-	  	}
-	  	
-	  	//若有props数据，则进行相应替换
-	  	if(class.props){
-	  		for(var i=0;i<class.props.length; i++){
-	  			//setter 1
-	  			//getter -1
-	  			var prop = class.props[i];
-	  			if(prop.description.indexOf("只读")>=0){
-	  				asjsfl.exportClassFunction2ASFile(class.name, class.props[i], -1);
-	  			}else{
-	  				asjsfl.exportClassFunction2ASFile(class.name, class.props[i], -1);
-	  				asjsfl.exportClassFunction2ASFile(class.name, class.props[i], 1);
-	  			}
-	  		}
+	  	if(!asjsfl.autoMode){
+		  	//若有funs数据，则进行相应替换
+		  	if(class.functions){
+		  		for(var i=0;i<class.functions.length; i++){
+		  			asjsfl.exportClassFunction2ASFile(class.name, class.functions[i], 0);
+		  		}
+		  	}
+		  	
+		  	//若有props数据，则进行相应替换
+		  	if(class.props){
+		  		for(var i=0;i<class.props.length; i++){
+		  			//setter 1
+		  			//getter -1
+		  			var prop = class.props[i];
+		  			if(prop.description.indexOf("只读")>=0){
+		  				asjsfl.exportClassFunction2ASFile(class.name, class.props[i], -1);
+		  			}else{
+		  				asjsfl.exportClassFunction2ASFile(class.name, class.props[i], -1);
+		  				asjsfl.exportClassFunction2ASFile(class.name, class.props[i], 1);
+		  			}
+		  		}
+		  	}
 	  	}
   },
   
@@ -361,8 +432,6 @@ var asjsfl = {
 	  	if(func.params && funcStr.match(/%PARAM%/)){
 	  		var paramsStr = "";
 	  		var paramTempStr = funcStr.match(/^.*\*\s?@param\s?%PARAM%/m) + "";
-	  		alert(funcStr);
-	  		alert(paramTempStr);
 	  		for(var i=0; i<func.params.length; i++){
 	  			if(i>0)paramsStr+="\n";
 	  			paramsStr += paramTempStr.replace(/%PARAM%/, func.params[i].name + "	" + func.params[i].description);
@@ -381,6 +450,8 @@ var asjsfl = {
 	  			paramsStr += param.name + ":" + type;
 	  		}
 	  		funcStr = funcStr.replace(/%FUNCTION_PARAMS%/, paramsStr);
+  		}else{
+	  		funcStr = funcStr.replace(/%FUNCTION_PARAMS%/, "");
   		}
 	  	
 	  	//替换“返回结果”字段
@@ -458,8 +529,11 @@ var asjsfl = {
 
 var delay = function(aEvent) { 
     var doc = aEvent.originalTarget;
+	if (doc.location.href.indexOf("http://help.adobe.com/zh_CN/flash/cs/extend/") < 0)  
+	    return;
     setTimeout(function() { 
-    	asjsfl.injectJQ(doc,aEvent); 
+    	asjsfl.injectJQ(doc,aEvent);
+    	asjsfl.autoExec();
     }, 1); 
 };
 
