@@ -3,11 +3,11 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>asjsfl@itamt.com</em:id>
     <em:type>2</em:type>
-    <em:name>Conver JSFL References to AS3</em:name>
+    <em:name>AS JSFL</em:name>
     <em:version>0.1</em:version>
     <em:creator>tamt</em:creator>
     <em:contributor></em:contributor>
-    <em:description>Conver JSFL References to AS3</em:description>
+    <em:description>从JSFL的在线帮助文档（http://help.adobe.com/zh_CN/flash/cs/extend/index.html）中提取出内容，并转化成AS3类文件</em:description>
     <em:unpack>true</em:unpack>
     <em:targetApplication>
       <Description>

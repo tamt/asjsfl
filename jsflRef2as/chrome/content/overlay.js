@@ -61,8 +61,6 @@ var asjsfl = {
 			var items = $("#ygtvc0 .ygtvitem:visible", this.win);
 			var indexs = asjsfl.lastAutoIndex.split(".");
 			
-			//alert("提取：" + asjsfl.lastAutoIndex);
-			
 			//已经达到最后一个结点
 			if(Number(indexs[0])>=items.length){
 				alert("转化完毕");
@@ -84,10 +82,10 @@ var asjsfl = {
 				hrefEle = $("table:first a", item);
 				
 				//指向下一个处理结点
-				if($(".ygtvchildren .ygtvitem", item)){
+				if($(".ygtvchildren .ygtvitem", item) && $(".ygtvchildren .ygtvitem", item).length>0){
 					asjsfl.lastAutoIndex = Number(indexs[0]) + "." + 0;
 				}else{
-					asjsfl.lastAutoIndex = Number(indexs[0]) + 1 + "";
+					asjsfl.lastAutoIndex = (Number(indexs[0]) + 1) + "";
 				}
 			}else if(indexs.length>1){
 				//提取子结点模式
