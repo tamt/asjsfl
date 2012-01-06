@@ -22,7 +22,6 @@ package jsfl{
 	 	 * @see http://help.adobe.com/zh_CN/flash/cs/extend/WS5b3ccc516d4fbf351e63e3d118a9024f3f-7a41.html
 		 */
 		public function get color():String{
-			
 		}
 	
 		/**
@@ -261,6 +260,23 @@ package jsfl{
 		 */
 		public function set visible():void{
 			
+		}
+
+		/**
+		 * 方法；选择当前图层中的某个范围内的帧，或者将选择的帧设置为传递到此方法的选定数组。 
+		 * @param startFrameIndex	 一个从零开始的索引，它指定要设置的起始帧。 
+		 * @param endFrameIndex	一个从零开始的索引，它指定选择范围的终点；endFrameIndex 是选择范围最后一帧后面的帧。 
+		 * @param bReplaceCurrentSelection	一个布尔值，如果设置为 true，则在选择指定帧之前取消选择当前选定的帧。默认值为 true。 
+		 * @param selectionList	三个整数组成的数组，由 timeline.getSelectedFrames() 返回。 
+		 * @return 无。 
+		 * @example <p>下面的示例展示了两种方法，它们用于选择顶层图层的第 1 帧到（但不包括）第 10 帧，然后将该图层的第 12 帧到（但不包括）第 15 帧添加到当前选择（记住，索引值不同于帧编号值）：下面的示例首先将所选帧的数组存储在 savedSelectionList 变量中，然后在有命令或用户交互更改了选择之后，在代码中使用该数组来重新选择这些帧：</p>
+		 * @usage <pre>timeline.setSelectedFrames(startFrameIndex, endFrameIndex [, bReplaceCurrentSelection]) 
+		timeline.setSelectedFrames(selectionList [, bReplaceCurrentSelection])</pre>
+		 * @productversion Flash MX 2004。
+		 * @see http://help.adobe.com/zh_CN/flash/cs/extend/WS5b3ccc516d4fbf351e63e3d118a9024f3f-7d00.html
+		 */
+		public function setSelectedFrames(startFrameIndex : int, endFrameIndex : int, bReplaceCurrentSelection : Boolean) : void
+		{
 		}
 		
 	}

@@ -195,7 +195,6 @@ package jsfl{
 	
 		/**
 		 * 属性；一个字符串，它指定 Frame 名称的类型。可接受值为 "none"、"name"、"comment" 和 "anchor"。将标签设置为 "none" 可清除 frame.name 属性。 
-
 		 * @return %RETURN%
 		 * @example <p>下面的示例将顶部图层中第一帧的名称设置为 "First Frame"，然后将其标签设置为 "comment"： </p>
 <pre></pre>
